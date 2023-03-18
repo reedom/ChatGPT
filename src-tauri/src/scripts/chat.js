@@ -53,6 +53,8 @@ async function chatBtns() {
         }
         const txt = i?.innerText?.trim() || '';
         if (!txt) return;
+        googleTextToSpeech(txt, saybtn);
+        return;
         const utterance = new SpeechSynthesisUtterance(txt);
         const voices = speechSynthesis.getVoices();
         let voice = voices.find(voice => voice.voiceURI === chatConf.speech_lang);
@@ -77,6 +79,17 @@ async function chatBtns() {
         }
       }
     })
+}
+
+async function googleTextToSpeech(text, btn) {
+  amISpeaking = true;
+  btn.innerHTML = setIcon('speaking');
+  try {
+    await invoke('google_text_to_speech', { text })
+  } finally {
+    amISpeaking = false;
+    btn.innerHTML = setIcon('voice');
+  }
 }
 
 function copyToClipboard(text, btn) {

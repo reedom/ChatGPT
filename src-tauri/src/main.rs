@@ -7,7 +7,7 @@ mod app;
 mod conf;
 mod utils;
 
-use app::{cmd, fs_extra, gpt, menu, setup, window};
+use app::{cmd, fs_extra, google_tts, gpt, menu, setup, window};
 use conf::AppConf;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_log::{
@@ -79,6 +79,7 @@ async fn main() {
       window::cmd::control_window,
       window::cmd::window_reload,
       window::cmd::dalle2_search_window,
+      google_tts::google_text_to_speech,
     ])
     .setup(setup::init)
     .menu(menu::init());
