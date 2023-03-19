@@ -40,7 +40,6 @@ pub_struct!(AppConf {
   save_window_state: bool,
   global_shortcut: Option<String>,
   default_origin: String,
-  speech_lang: String,
 
   // Main Window
   isinit: bool,
@@ -59,6 +58,12 @@ pub_struct!(AppConf {
   tray_dashboard: bool,
   tray_origin: String,
   ua_tray: String,
+
+  // Text-to-Speech
+  speech_service: String,
+  speech_lang: String,
+  google_cred: String,
+  google_speech_lang: String,
 });
 
 impl AppConf {
@@ -70,10 +75,6 @@ impl AppConf {
       save_window_state: false,
       theme: "light".into(),
       auto_update: "prompt".into(),
-      #[cfg(target_os = "macos")]
-      speech_lang: "com.apple.eloquence.en-US.Rocko".into(),
-      #[cfg(not(target_os = "macos"))]
-      speech_lang: "".into(),
       tray: true,
       popup_search: false,
       isinit: true,
@@ -91,6 +92,13 @@ impl AppConf {
       ua_tray: UA_MOBILE.into(),
       ua_window: "".into(),
       global_shortcut: None,
+      speech_service: "system".into(),
+      #[cfg(target_os = "macos")]
+      speech_lang: "com.apple.eloquence.en-US.Rocko".into(),
+      #[cfg(not(target_os = "macos"))]
+      speech_lang: "".into(),
+      google_cred: "".into(),
+      google_speech_lang: "".into(),
     }
   }
 
