@@ -1,9 +1,10 @@
+use crate::conf::AppConf;
 use google_cognitive_apis::api::grpc::google::cloud::texttospeech::v1::{
   synthesis_input::InputSource, AudioConfig, AudioEncoding, ListVoicesRequest, ListVoicesResponse,
   SynthesisInput, SynthesizeSpeechRequest, VoiceSelectionParams,
 };
 use google_cognitive_apis::texttospeech::synthesizer::Synthesizer;
-use log::info;
+use log::{error, info};
 use rodio::{Decoder, OutputStream, Sink};
 use std::io::Cursor;
 use tauri::{command, AppHandle};
@@ -12,6 +13,43 @@ use tauri::{command, AppHandle};
 pub async fn google_validate_credential(_app: AppHandle, text: String) -> bool {
   let res = Synthesizer::create(text).await;
   return !res.is_err();
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct GoogleTtsVoice {
+  pub name: String,
+  pub language_codes: Vec<String>,
+  pub gender: i32,
+}
+
+#[command]
+pub async fn google_text_to_speech_voices(_app: AppHandle) -> Option<Vec<GoogleTtsVoice>> {
+  let app_conf = AppConf::read();
+  match Synthesizer::create(app_conf.google_cred).await {
+    Ok(mut synthesizer) => {
+      let voices_resp: ListVoicesResponse = synthesizer
+        .list_voices(ListVoicesRequest {
+          language_code: "en".to_string(),
+        })
+        .await
+        .unwrap();
+
+      let mut list = vec![];
+      for voice in voices_resp.voices {
+        let google_voice = GoogleTtsVoice {
+          name: voice.name,
+          language_codes: voice.language_codes,
+          gender: voice.ssml_gender,
+        };
+        list.push(google_voice);
+      }
+      return Some(list);
+    }
+    Err(err) => {
+      error!("failed to list up voices: {:?}", err);
+      return None;
+    }
+  }
 }
 
 #[command]
