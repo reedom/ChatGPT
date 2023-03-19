@@ -18,7 +18,8 @@ interface State {
   enabledGoogleTts: boolean;
   hasNewCredential: boolean;
   voices?: GoogleTtsVoice[];
-  selected?: GoogleTtsVoice;
+  selectedName?: string;
+  setSelectedName: (name: string) => void;
   loadCredential: () => void;
 }
 
@@ -37,26 +38,31 @@ export const Context = createContext<State>({} as State);
 
 export const GoogleTtsStateProvider: FC<Props> = ({ children }) => {
   const form = useFormInstance();
-  const [credential, setCredential] = useState(form.getFieldValue('google_cred'));
+  const [credential, setCredential] = useState<string>(form.getFieldValue('google_cred'));
+  const [selectedName, setSelectedName] = useState<string>(
+    form.getFieldValue('google_speech_name'),
+  );
   const [voices, setVoices] = useState<GoogleTtsVoice[]>();
-  const [selected, setSelected] = useState<GoogleTtsVoice | undefined>();
+  const [selectedVoice, setSelectedVoice] = useState<GoogleTtsVoice | undefined>();
   const [enabledGoogleTts] = useState<boolean>(!!credential);
   const [hasNewCredential, setHasNewCredential] = useState(false);
 
   useEffect(() => {
     if (!credential) return;
 
-    invoke<any>('google_text_to_speech_voices')
-      .then((voices) => {
-        if (voices) {
-          setVoices(voices);
-          setSelected(voices[0]);
-        } else {
-          setSelected(undefined);
-        }
-      })
-      .catch();
+    invoke<any>('google_text_to_speech_voices').then(setVoices);
   }, [credential]);
+
+  useEffect(() => {
+    if (!voices?.length) return;
+
+    const voice = voices.find((v) => v.name === selectedName);
+    setSelectedVoice(voice);
+    if (voice && selectedName) {
+      form.setFieldValue('google_speech_name', voice.name);
+      form.setFieldValue('google_speech_gender', voice.gender);
+    }
+  }, [voices, selectedName]);
 
   const loadCredential = async () => {
     const selected = await open({
@@ -93,14 +99,23 @@ export const GoogleTtsStateProvider: FC<Props> = ({ children }) => {
         enabledGoogleTts,
         hasNewCredential,
         voices,
-        selected,
+        selectedName,
         loadCredential,
+        setSelectedName: (name) => {
+          setSelectedName(name);
+        },
       }}
     >
       <>
         {children}
         <Form.Item hidden name="google_cred">
-          <Input value={credential} />
+          <Input value={form.getFieldValue('google_cred')} />
+        </Form.Item>
+        <Form.Item hidden name="google_speech_name">
+          <Input value={form.getFieldValue('google_speech_name')} />
+        </Form.Item>
+        <Form.Item hidden name="google_speech_gender">
+          <Input value={form.getFieldValue('google_speech_gender')} />
         </Form.Item>
       </>
     </Context.Provider>

@@ -1,31 +1,35 @@
-import { Button, Form, Select, Tag } from 'antd';
+import { Button, Select, Tag } from 'antd';
 import { Gender, useGoogleTtsState } from './useGoogleTtsState';
 import { SpeechService, useTtsState } from '@view/settings/TextToSpeech/useTtsState';
+import useFormInstance from 'antd/es/form/hooks/useFormInstance';
 
 export default function GoogleTtsVoices() {
   const { setSpeechService } = useTtsState();
-  const { voices } = useGoogleTtsState();
+  const { voices, selectedName, setSelectedName } = useGoogleTtsState();
+  const form = useFormInstance();
 
   return (
-    <Form.Item name="google_speech_lang">
-      <Select
-        style={{ width: 300 }}
-        disabled={!voices}
-        onSelect={() => setSpeechService(SpeechService.google)}
-      >
-        {!voices
-          ? null
-          : voices.map((voice) => {
-              return (
-                <Select.Option key={voice.name} value={voice.name}>
-                  {voice.name} {': '}
-                  <Tag>{voice.language_codes[0]}</Tag>
-                  <Tag>{Gender[voice.gender]}</Tag>
-                </Select.Option>
-              );
-            })}
-      </Select>
-    </Form.Item>
+    <Select
+      style={{ width: 300 }}
+      disabled={!voices}
+      onSelect={(name: string) => {
+        setSpeechService(SpeechService.google);
+        setSelectedName(name);
+      }}
+      defaultValue={selectedName}
+    >
+      {!voices
+        ? null
+        : voices.map((voice) => {
+            return (
+              <Select.Option key={voice.name} value={voice.name}>
+                {voice.name} {': '}
+                <Tag>{voice.language_codes[0]}</Tag>
+                <Tag>{Gender[voice.gender]}</Tag>
+              </Select.Option>
+            );
+          })}
+    </Select>
   );
 }
 

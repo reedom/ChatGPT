@@ -54,23 +54,17 @@ pub async fn google_text_to_speech_voices(_app: AppHandle) -> Option<Vec<GoogleT
 
 #[command]
 pub async fn google_text_to_speech(_app: AppHandle, text: String) -> bool {
-  info!("google_text_to_speech start!");
-  info!("google_text_to_speech text: {}", text);
-  // let credentials = fs::read_to_string("/tmp/cred.json").unwrap();
-  let credentials = r##"
-"##;
+  let app_conf = AppConf::read();
+  let res = Synthesizer::create(app_conf.google_cred).await;
+  if res.is_err() {
+    error!(
+      "failed to activate the tts service: {:?}",
+      res.err().unwrap()
+    );
+    return false;
+  }
 
-  let mut synthesizer = Synthesizer::create(credentials).await.unwrap();
-
-  let voices_resp: ListVoicesResponse = synthesizer
-    .list_voices(ListVoicesRequest {
-      language_code: "en".to_string(),
-    })
-    .await
-    .unwrap();
-
-  let voice1 = &voices_resp.voices[0];
-
+  let mut synthesizer = res.unwrap();
   let response = synthesizer
     .synthesize_speech(SynthesizeSpeechRequest {
       input: Some(SynthesisInput {
@@ -78,8 +72,8 @@ pub async fn google_text_to_speech(_app: AppHandle, text: String) -> bool {
       }),
       voice: Some(VoiceSelectionParams {
         language_code: "en".to_string(),
-        name: voice1.name.to_owned(),
-        ssml_gender: voice1.ssml_gender,
+        name: app_conf.google_speech_name.to_owned(),
+        ssml_gender: app_conf.google_speech_gender,
       }),
       audio_config: Some(AudioConfig {
         audio_encoding: AudioEncoding::Linear16 as i32,

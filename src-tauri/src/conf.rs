@@ -63,7 +63,8 @@ pub_struct!(AppConf {
   speech_service: String,
   speech_lang: String,
   google_cred: String,
-  google_speech_lang: String,
+  google_speech_name: String,
+  google_speech_gender: i32,
 });
 
 impl AppConf {
@@ -98,7 +99,8 @@ impl AppConf {
       #[cfg(not(target_os = "macos"))]
       speech_lang: "".into(),
       google_cred: "".into(),
-      google_speech_lang: "".into(),
+      google_speech_name: "".into(),
+      google_speech_gender: 0,
     }
   }
 
@@ -130,6 +132,7 @@ impl AppConf {
       info!("conf_create");
     }
     if let Ok(v) = serde_json::to_string_pretty(&self) {
+      info!("writing: {}", v);
       std::fs::write(path, v).unwrap_or_else(|err| {
         error!("conf_write: {}", err);
         Self::default().write();
