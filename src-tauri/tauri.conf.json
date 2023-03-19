@@ -42,6 +42,10 @@
         "exit": true,
         "relaunch": true,
         "relaunchDangerousAllowSymlinkMacos": true
+      },
+      "shell": {
+        "all": false,
+        "open": true
       }
     },
     "systemTray": {
