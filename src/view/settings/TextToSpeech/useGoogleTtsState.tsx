@@ -21,6 +21,7 @@ interface State {
   selectedName?: string;
   setSelectedName: (name: string) => void;
   loadCredential: () => void;
+  speak: (text: string) => void;
 }
 
 export enum Gender {
@@ -50,7 +51,9 @@ export const GoogleTtsStateProvider: FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!credential) return;
 
-    invoke<any>('google_text_to_speech_voices').then(setVoices);
+    invoke<any>('google_text_to_speech_voices').then((voices: GoogleTtsVoice[]) => {
+      setVoices(voices.sort((a, b) => a.name.localeCompare(b.name)));
+    });
   }, [credential]);
 
   useEffect(() => {
@@ -93,6 +96,10 @@ export const GoogleTtsStateProvider: FC<Props> = ({ children }) => {
     } catch (e) {}
   };
 
+  const speak = (text: string) => {
+    invoke('google_text_to_speech', { text, name: selectedName });
+  };
+
   return (
     <Context.Provider
       value={{
@@ -104,6 +111,7 @@ export const GoogleTtsStateProvider: FC<Props> = ({ children }) => {
         setSelectedName: (name) => {
           setSelectedName(name);
         },
+        speak,
       }}
     >
       <>

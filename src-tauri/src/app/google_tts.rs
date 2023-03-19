@@ -4,7 +4,7 @@ use google_cognitive_apis::api::grpc::google::cloud::texttospeech::v1::{
   SynthesisInput, SynthesizeSpeechRequest, VoiceSelectionParams,
 };
 use google_cognitive_apis::texttospeech::synthesizer::Synthesizer;
-use log::{error, info};
+use log::error;
 use rodio::{Decoder, OutputStream, Sink};
 use std::io::Cursor;
 use tauri::{command, AppHandle};
@@ -53,7 +53,7 @@ pub async fn google_text_to_speech_voices(_app: AppHandle) -> Option<Vec<GoogleT
 }
 
 #[command]
-pub async fn google_text_to_speech(_app: AppHandle, text: String) -> bool {
+pub async fn google_text_to_speech(_app: AppHandle, text: String, name: Option<String>) -> bool {
   let app_conf = AppConf::read();
   let res = Synthesizer::create(app_conf.google_cred).await;
   if res.is_err() {
@@ -65,6 +65,7 @@ pub async fn google_text_to_speech(_app: AppHandle, text: String) -> bool {
   }
 
   let mut synthesizer = res.unwrap();
+  let name = name.unwrap_or(app_conf.google_speech_name);
   let response = synthesizer
     .synthesize_speech(SynthesizeSpeechRequest {
       input: Some(SynthesisInput {
@@ -72,7 +73,7 @@ pub async fn google_text_to_speech(_app: AppHandle, text: String) -> bool {
       }),
       voice: Some(VoiceSelectionParams {
         language_code: "en".to_string(),
-        name: app_conf.google_speech_name.to_owned(),
+        name: name.to_owned(),
         ssml_gender: app_conf.google_speech_gender,
       }),
       audio_config: Some(AudioConfig {

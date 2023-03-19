@@ -9,13 +9,17 @@ import {
   TtsStateProvider,
   useTtsState,
 } from '@view/settings/TextToSpeech/useTtsState';
+import Playground from '@view/settings/TextToSpeech/Playground';
+import { BrowserBundledProvider } from '@view/settings/TextToSpeech/useBrowserBundledState';
 
 export default function TextToSpeech() {
   return (
     <TtsStateProvider>
-      <GoogleTtsStateProvider>
-        <Component />
-      </GoogleTtsStateProvider>
+      <BrowserBundledProvider>
+        <GoogleTtsStateProvider>
+          <Component />
+        </GoogleTtsStateProvider>
+      </BrowserBundledProvider>
     </TtsStateProvider>
   );
 }
@@ -61,6 +65,7 @@ function Component() {
           </Typography.Text>
         </div>
       )}
+      <Playground />
       {hasNewCredential && (
         <Alert
           style={{ marginBottom: '20px' }}

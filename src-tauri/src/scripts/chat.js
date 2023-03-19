@@ -53,43 +53,41 @@ async function chatBtns() {
         }
         const txt = i?.innerText?.trim() || '';
         if (!txt) return;
-        googleTextToSpeech(txt, saybtn);
-        return;
-        const utterance = new SpeechSynthesisUtterance(txt);
-        const voices = speechSynthesis.getVoices();
-        let voice = voices.find(voice => voice.voiceURI === chatConf.speech_lang);
-        if (!voice) {
-          voice = voices.find(voice => voice.lang === 'en-US');
-        }
-        utterance.voice = voice;
-        currentIndex = idx;
-        utterance.lang = voice.lang;
-        // utterance.rate = 0.7;
-        // utterance.pitch = 1.1;
-        // utterance.volume = 1;
-        synth.speak(utterance);
-        amISpeaking = synth.speaking;
-        saybtn.innerHTML = setIcon('speaking');
-        currentUtterance = utterance;
-        currentIndex = idx;
-        utterance.onend = () => {
-          saybtn.innerHTML = setIcon('voice');
-          currentUtterance = null;
-          currentIndex = -1;
+
+        if (chatConf.speech_service === 'google') {
+          amISpeaking = true;
+          saybtn.innerHTML = setIcon('speaking');
+          invoke('google_text_to_speech', { text: txt })
+            .finally(() => {
+              amISpeaking = false;
+              saybtn.innerHTML = setIcon('voice');
+            });
+        } else {
+          const utterance = new SpeechSynthesisUtterance(txt);
+          const voices = speechSynthesis.getVoices();
+          let voice = voices.find(voice => voice.voiceURI === chatConf.speech_lang);
+          if (!voice) {
+            voice = voices.find(voice => voice.lang === 'en-US');
+          }
+          utterance.voice = voice;
+          currentIndex = idx;
+          utterance.lang = voice.lang;
+          // utterance.rate = 0.7;
+          // utterance.pitch = 1.1;
+          // utterance.volume = 1;
+          synth.speak(utterance);
+          amISpeaking = synth.speaking;
+          saybtn.innerHTML = setIcon('speaking');
+          currentUtterance = utterance;
+          currentIndex = idx;
+          utterance.onend = () => {
+            saybtn.innerHTML = setIcon('voice');
+            currentUtterance = null;
+            currentIndex = -1;
+          }
         }
       }
-    })
-}
-
-async function googleTextToSpeech(text, btn) {
-  amISpeaking = true;
-  btn.innerHTML = setIcon('speaking');
-  try {
-    await invoke('google_text_to_speech', { text })
-  } finally {
-    amISpeaking = false;
-    btn.innerHTML = setIcon('voice');
-  }
+  })
 }
 
 function copyToClipboard(text, btn) {

@@ -65,6 +65,7 @@ pub_struct!(AppConf {
   google_cred: String,
   google_speech_name: String,
   google_speech_gender: i32,
+  speech_example: String,
 });
 
 impl AppConf {
@@ -101,6 +102,7 @@ impl AppConf {
       google_cred: "".into(),
       google_speech_name: "".into(),
       google_speech_gender: 0,
+      speech_example: "Don't judge each day by the harvest you reap but by the seeds that you plant. -Robert Louis Stevenson".into(),
     }
   }
 
