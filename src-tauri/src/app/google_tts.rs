@@ -9,6 +9,12 @@ use std::io::Cursor;
 use tauri::{command, AppHandle};
 
 #[command]
+pub async fn google_validate_credential(_app: AppHandle, text: String) -> bool {
+  let res = Synthesizer::create(text).await;
+  return !res.is_err();
+}
+
+#[command]
 pub async fn google_text_to_speech(_app: AppHandle, text: String) -> bool {
   info!("google_text_to_speech start!");
   info!("google_text_to_speech text: {}", text);

@@ -79,6 +79,7 @@ async fn main() {
       window::cmd::control_window,
       window::cmd::window_reload,
       window::cmd::dalle2_search_window,
+      google_tts::google_validate_credential,
       google_tts::google_text_to_speech,
     ])
     .setup(setup::init)
