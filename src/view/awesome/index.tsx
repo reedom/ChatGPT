@@ -188,6 +188,9 @@ const PreviewTip = () => {
           <Tag onClick={() => handleGo('tray_window')} color="blue">
             SystemTray Window
           </Tag>
+          <Tag onClick={() => handleGo('text_to_speech')} color="blue">
+            Text-to-Speech
+          </Tag>
         </div>
       }
     >

@@ -10,6 +10,7 @@ import { chatRoot, APP_CONF_JSON } from '@/utils';
 import General from './General';
 import MainWindow from './MainWindow';
 import TrayWindow from './TrayWindow';
+import TextToSpeech from './TextToSpeech';
 
 export default function Settings() {
   const [params] = useSearchParams();
@@ -84,6 +85,7 @@ export default function Settings() {
             { label: 'General', key: 'general', children: <General /> },
             { label: 'Main Window', key: 'main_window', children: <MainWindow /> },
             { label: 'SystemTray Window', key: 'tray_window', children: <TrayWindow /> },
+            { label: 'Text-to-Speech', key: 'text-to-speech', children: <TextToSpeech /> },
           ]}
         />
 

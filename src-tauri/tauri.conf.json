@@ -15,6 +15,9 @@
       "globalShortcut": {
         "all": true
       },
+      "dialog": {
+        "open": true
+      },
       "fs": {
         "all": false,
         "readFile": true,
